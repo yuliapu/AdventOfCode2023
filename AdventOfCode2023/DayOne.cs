@@ -30,7 +30,7 @@ internal class DayOne
 		{
 			var words = wordsToDigits.Keys;
 			var orderedWords = words.OrderBy(i => line.IndexOf(i));
-			var reverseOrderedWords = words.OrderBy(i => line.LastIndexOf(i));
+			var reverseOrderedWords = words.OrderBy(i => line.LastIndexOf(i)); 
 
 			string firstDigit = orderedWords.First(i => line.Contains(i));
 			string lastDigit = reverseOrderedWords.Last(i => line.Contains(i));
@@ -39,7 +39,7 @@ internal class DayOne
 			Console.WriteLine(calibrationValue);
 			sum += calibrationValue;
 		}
-
+		
 
 		Console.WriteLine(sum);
 	}

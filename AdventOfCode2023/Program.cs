@@ -1,3 +1,4 @@
 ﻿using AdventOfCode2023;
 
-DayOne.TaskTwo();
+//DayOne.TaskTwo();
+DayTwo.TaskTwo();
