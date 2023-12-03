@@ -72,38 +72,13 @@ internal class DayTwo
 			int gameId = int.Parse(cubeSets[0].Split(' ')[1]);
 			foreach (string gameSet in cubeSets.Skip(1))
 			{
-				string[] cubesOfGameSet = gameSet.Split(',', StringSplitOptions.RemoveEmptyEntries);
-				foreach (string cubesOfColor in cubesOfGameSet)
-				{
-					if (cubesOfColor.Contains("red"))
-					{
-						int cubesCount = int.Parse(cubesOfColor.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0]);
-						if (maxRed < cubesCount)
-						{
-							maxRed = cubesCount;
-							continue;
-						}
-					}
-					else if (cubesOfColor.Contains("blue"))
-					{
-						int cubesCount = int.Parse(cubesOfColor.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0]);
-						if (maxBlue < cubesCount)
-						{
-							maxBlue = cubesCount;
-							continue;
-						}
+				IEnumerable<string[]> cubesOfGameSet = gameSet
+					.Split(',', StringSplitOptions.RemoveEmptyEntries)
+					.Select(i => i.Split(' ', StringSplitOptions.RemoveEmptyEntries));
 
-					}
-					else if (cubesOfColor.Contains("green"))
-					{
-						int cubesCount = int.Parse(cubesOfColor.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0]);
-						if (maxGreen < cubesCount)
-						{
-							maxGreen = cubesCount;
-							continue;
-						}
-					}
-				}
+				findMaxCubesCount(cubesOfGameSet, "red", ref maxRed);
+				findMaxCubesCount(cubesOfGameSet, "blue", ref maxBlue);
+				findMaxCubesCount(cubesOfGameSet, "green", ref maxGreen);
 			}
 
 			Console.WriteLine($"{maxRed} red, {maxGreen} green, {maxBlue} blue");
@@ -111,5 +86,15 @@ internal class DayTwo
 		}
 
 		Console.WriteLine(sum);
+	}
+
+	private static void findMaxCubesCount(IEnumerable<string[]> cubesOfGameSet, string color, ref int maxByColor)
+	{
+		int redCubesCount = int.Parse(cubesOfGameSet
+			.Where(i => i.Last() == color)
+			.Max(i => i.First()) ?? "0");
+
+		if (maxByColor < redCubesCount)
+			maxByColor = redCubesCount;
 	}
 }
