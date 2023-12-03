@@ -1,4 +1,5 @@
 ﻿using AdventOfCode2023;
+using System.Linq;
 
 internal class DayThree
 {
@@ -116,5 +117,106 @@ internal class DayThree
 
 	public static void TaskTwo()
 	{
+		List<string> inputLines = new Input().input3.Split("\r\n").ToList();
+
+		List<(char, string, int)> adjWithNumbers = new List<(char, string, int)>();
+		double sum = 0;
+		for (int i = 0; i < inputLines.Count; i++)
+		{
+			string line = inputLines[i];
+
+			int startIndexOfNumber = -1;
+			int endIndexOfNumber = -1;
+			for (int j = 0; j < line.Length; j++)
+			{
+				if (char.IsDigit(line[j]))
+				{
+					if (startIndexOfNumber != -1)
+					{
+						endIndexOfNumber = j;
+					}
+
+					else
+					{
+						startIndexOfNumber = j;
+						endIndexOfNumber = j;
+					}
+
+					if (j == line.Length - 1)
+					{
+						int number = int.Parse(line.Substring(startIndexOfNumber, endIndexOfNumber - startIndexOfNumber + 1));
+						List<(char, string, int)> adjElements = GetSymbolAdjacentElementsWithIndexes(inputLines, i, j - 1, startIndexOfNumber, number);
+						adjWithNumbers.AddRange(adjElements);
+					}
+
+				}
+
+				else if (startIndexOfNumber != -1)
+				{
+					int number = int.Parse(line.Substring(startIndexOfNumber, endIndexOfNumber - startIndexOfNumber + 1));
+					List<(char, string, int)> adjElements = GetSymbolAdjacentElementsWithIndexes(inputLines, i, j - 1, startIndexOfNumber, number);
+					adjWithNumbers.AddRange(adjElements);
+
+					startIndexOfNumber = -1;
+					endIndexOfNumber = -1;
+				}
+			}
+		}
+
+		var gears = adjWithNumbers.GroupBy(el => el.Item2).Where(i => i.Count()>1);
+		foreach (var gear in gears)
+		{
+			int gearValue = gear.First().Item3 * gear.Last().Item3;
+			sum += gearValue;
+			Console.WriteLine(gearValue);
+		}
+
+		Console.WriteLine(sum);
+	}
+	
+	private static List<(char, string, int)> GetSymbolAdjacentElementsWithIndexes(List<string> lines, int i, int j, int startIndex, int number)
+	{
+		List<(char, string, int)> result = new List<(char, string, int)>();
+
+		while (j >= startIndex)
+		{
+			if (j > 0)
+			{
+				CheckAndAddSymbol(lines, i, j - 1, number, ref result);
+
+				if (i > 0)
+				{
+					CheckAndAddSymbol(lines, i - 1, j - 1, number, ref result);
+				}
+				if (i < lines.Count - 1)
+				{
+					CheckAndAddSymbol(lines, i + 1, j - 1, number, ref result);
+				}
+			}
+			if (i > 0)
+			{
+				CheckAndAddSymbol(lines, i - 1, j, number, ref result);
+				CheckAndAddSymbol(lines, i - 1, j + 1, number, ref result);
+			}
+			if (i < lines.Count - 1)
+			{
+				CheckAndAddSymbol(lines, i + 1, j, number, ref result);
+				if (j < lines[i].Length - 1)
+				{
+					CheckAndAddSymbol(lines, i, j + 1, number, ref result);
+					CheckAndAddSymbol(lines, i + 1, j + 1, number, ref result);
+				}
+			}
+
+			j--;
+		}
+		return result;
+	}
+
+	private static void CheckAndAddSymbol(List<string> lines, int i, int j, int number, ref List<(char, string, int)> result)
+	{
+		if (IsSymbol(lines[i][j]))
+			if (!result.Any(el => el.Item2.Equals($"{i},{j}")))
+				result.Add((lines[i][j], $"{i},{j}", number));
 	}
 }
